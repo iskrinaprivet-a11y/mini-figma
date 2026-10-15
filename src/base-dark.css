@@ -1,0 +1,27 @@
+/*
+ * ОБЩАЯ ТЁМНАЯ БАЗА ОБЕИХ СТРАНИЦ (лендинг и редактор).
+ *
+ * Раньше эти правила жили только в src/index.css, и лендинг оставался без
+ * color-scheme: на тёмном фоне Windows/Chrome рисовал светлую полосу
+ * прокрутки. Теперь обе точки входа импортируют этот файл.
+ */
+
+/* Тёмные системные полосы прокрутки и контролы — вместо светлых по умолчанию. */
+:root {
+  color-scheme: dark;
+}
+
+/* Полосы прокрутки в панелях — неброские, под тёмную тему. */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-edge);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: transparent;
+}

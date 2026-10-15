@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './base-dark.css';
 
 /* ЛЕНДИНГ. Токены те же, что у редактора (src/index.css), плюс акцент:
    это цвет рамки выделения из редактора (#38bdf8) — палитра берётся
@@ -10,7 +11,6 @@
   --color-ink: #e2e8f0; /* основной текст, не чистый белый */
   --color-accent: #38bdf8; /* акцент — цвет выделения в редакторе */
   --color-accent-hover: #7dd3fc;
-  --color-accent-deep: #0ea5e9;
   --color-accent-ink: #10243a; /* текст на акцентной плашке */
 
   --font-sans:
@@ -33,6 +33,11 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /* Открытое мобильное меню не даёт фону прокручиваться под панелью. */
+  body.menu-open {
+    overflow: hidden;
   }
 
   /* Якоря не заезжают под липкий хедер. */
@@ -85,8 +90,10 @@
     mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 35%, transparent 100%);
   }
 
-  /* Появление секций: без JS класс не добавляется — содержимое видно сразу. */
-  [data-reveal] {
+  /* Появление секций при прокрутке. Прячем только когда JS жив: класс .js
+     ставит инлайн-скрипт в <head> страницы, поэтому без скриптов (политика
+     блокировки, старый браузер, парсер) контент виден сразу. */
+  .js [data-reveal] {
     opacity: 0;
     transform: translateY(8px);
     transition:
@@ -94,31 +101,51 @@
       transform 240ms ease-out;
   }
 
-  [data-reveal].is-visible {
+  .js [data-reveal].is-visible {
     opacity: 1;
     transform: none;
   }
 }
 
-/* Мобильное меню: до 768px — выпадающая панель, дальше — обычный ряд. */
+/* Мобильное меню: до 768px — выпадающая панель, дальше — обычный ряд.
+   Без JS бургер не работает, поэтому навигация видна всегда (на узком экране
+   просто переносится строками), а кнопка-бургер и скрытое состояние панели
+   включаются только с классом .js. Позиция панели живёт здесь, а не в
+   классах разметки: так правила «без JS» и «с JS» не спорят со
+   специфичностью утилит Tailwind. */
 #nav-menu {
+  display: flex;
+}
+
+.js #nav-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
   display: none;
 }
 
-#nav-menu.is-open {
+.js #nav-menu.is-open {
   display: flex;
 }
 
 #menu-button {
+  display: none;
+}
+
+.js #menu-button {
   display: inline-flex;
 }
 
 @media (min-width: 768px) {
-  #nav-menu {
+  #nav-menu,
+  .js #nav-menu {
+    position: static;
     display: flex;
   }
 
-  #menu-button {
+  #menu-button,
+  .js #menu-button {
     display: none;
   }
 }
@@ -129,7 +156,7 @@
     scroll-behavior: auto;
   }
 
-  [data-reveal] {
+  .js [data-reveal] {
     opacity: 1;
     transform: none;
     transition: none;

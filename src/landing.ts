@@ -28,13 +28,16 @@ if (reduceMotion || typeof IntersectionObserver === 'undefined') {
   revealTargets.forEach((el) => observer.observe(el))
 }
 
-// Мобильное меню: бургер открывает панель, якорь — закрывает.
+// Мобильное меню: бургер открывает панель, якорь — закрывает. Escape, клик
+// вне панели и разворот окна до десктопной ширины возвращают меню в закрытое
+// состояние, а открытое меню блокирует прокрутку фона.
 const menuButton = document.querySelector<HTMLButtonElement>('#menu-button')
 const menu = document.querySelector<HTMLElement>('#nav-menu')
 
 const setMenuOpen = (open: boolean): void => {
   menu?.classList.toggle('is-open', open)
   menuButton?.setAttribute('aria-expanded', String(open))
+  document.body.classList.toggle('menu-open', open)
 }
 
 menuButton?.addEventListener('click', () => {
@@ -43,4 +46,25 @@ menuButton?.addEventListener('click', () => {
 
 menu?.querySelectorAll('a').forEach((link) => {
   link.addEventListener('click', () => setMenuOpen(false))
+})
+
+// Escape закрывает открытое меню, фокус возвращаем на кнопку.
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !menu?.classList.contains('is-open')) return
+  setMenuOpen(false)
+  menuButton?.focus()
+})
+
+// Клик или тап вне панели — тоже закрытие.
+document.addEventListener('pointerdown', (event) => {
+  const target = event.target
+  if (!(target instanceof Node)) return
+  if (menu?.contains(target) || menuButton?.contains(target)) return
+  setMenuOpen(false)
+})
+
+// Экран развернули до десктопного — возвращаем корректное aria-expanded.
+const desktopQuery = window.matchMedia('(min-width: 768px)')
+desktopQuery.addEventListener('change', (event) => {
+  if (event.matches) setMenuOpen(false)
 })
