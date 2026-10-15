@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Сторонний клон Figsor — материал разведки, в проект и в линтер не входит.
+figsor/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
