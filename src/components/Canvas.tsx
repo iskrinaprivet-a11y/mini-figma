@@ -528,12 +528,6 @@ function screenPointOf(event: { clientX: number; clientY: number }): ScreenPoint
       {/* Сетка: едет вместе с камерой, размер ячейки зависит от зума. */}
       <div className="absolute inset-0" style={gridStyle} />
 
-      {/* Подпись страницы. pointer-events-none — иначе она перехватывала бы
-          клики мыши в верхней части холста и мешала рисованию. */}
-      <p className="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 rounded-md bg-panel/90 px-3 py-1.5 text-xs tracking-wide text-slate-300 ring-1 ring-edge select-none">
-        Мой первый сайт в интернете!
-      </p>
-
       {/* Мир фигур. Один transform на весь слой — координаты фигур остаются
           «как в файле», а экранные пиксели появляются только в CSS.
           Поэтому фигуры масштабируются вместе с холстом сами по себе:

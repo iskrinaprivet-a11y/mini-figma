@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './base-dark.css';
 
 /* Палитра сиреневых поверхностей. Раньше тема держалась на slate-*: канвас
    и корпус — bg-slate-950, панели — bg-slate-900, границы — border-slate-800.
@@ -10,13 +11,10 @@
   --color-edge: #3b2e58; /* границы и разделители */
 }
 
-/* Базовый экран приложения. Тёмная тема зашита в цвета компонентов,
-   поэтому здесь только сброс браузера и запрет прокрутки/выделения:
+/* Базовый экран приложения. Тёмная тема зашита в цвета компонентов
+   (color-scheme и полосы прокрутки — в src/base-dark.css, общей для обеих
+   страниц), поэтому здесь только сброс браузера и запрет прокрутки/выделения:
    холст занимает весь viewport и не «прыгает». */
-
-:root {
-  color-scheme: dark;
-}
 
 html,
 body,
@@ -40,19 +38,4 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-}
-
-/* Полосы прокрутки в панелях — неброские, под тёмную тему. */
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: var(--color-edge);
-  border-radius: 9999px;
-}
-
-*::-webkit-scrollbar-track {
-  background-color: transparent;
 }

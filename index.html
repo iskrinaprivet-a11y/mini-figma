@@ -2,12 +2,717 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mini Figma</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#201833" />
+    <title>Mini Figma — учебный редактор векторной графики</title>
+    <meta
+      name="description"
+      content="Холст с сеткой, зум от 10% до 400%, фигуры протяжкой мыши, картинки из буфера обмена и история, которая отменяет жесты целиком. Учебный редактор на React и TypeScript."
+    />
+    <link rel="canonical" href="https://iskrinaprivet-a11y.github.io/mini-figma/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mini Figma — учебный редактор векторной графики" />
+    <meta
+      property="og:description"
+      content="Холст с сеткой, зум 10–400%, фигуры протяжкой, картинки из буфера и история жестов. Открывается в браузере, без установки."
+    />
+    <meta property="og:url" content="https://iskrinaprivet-a11y.github.io/mini-figma/" />
+    <meta
+      property="og:image"
+      content="https://iskrinaprivet-a11y.github.io/mini-figma/screenshot.png"
+    />
+
+    <!--
+      Антимошенник: страница читается и без JS. Прячем секции для появления
+      при прокрутке и мобильное меню только там, где браузер понимает модули
+      (иначе src/landing.ts не выполнится, и контент останется скрытым).
+    -->
+    <script>
+      if ('noModule' in HTMLScriptElement.prototype) document.documentElement.classList.add('js')
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/landing.css" />
   </head>
+
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:font-semibold focus:text-accent-ink"
+      >К содержимому</a
+    >
+
+    <header
+      class="sticky top-0 z-50 border-b border-edge/70 bg-canvas/85 backdrop-blur"
+    >
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3.5">
+        <a href="./" class="font-mono text-lg font-semibold tracking-tight"
+          >mini<span class="text-accent">·</span>figma</a
+        >
+
+        <nav
+          id="nav-menu"
+          aria-label="Основная навигация"
+          class="flex-col gap-1 border-b border-edge bg-panel px-6 py-4 md:flex-row md:items-center md:gap-7 md:border-0 md:bg-transparent md:p-0"
+        >
+          <a
+            href="#features"
+            class="rounded-md px-3 py-2 text-sm font-medium text-ink/70 transition-colors duration-150 hover:bg-white/[0.04] hover:text-ink md:px-0 md:py-0 md:hover:bg-transparent"
+            >Возможности</a
+          >
+          <a
+            href="#hotkeys"
+            class="rounded-md px-3 py-2 text-sm font-medium text-ink/70 transition-colors duration-150 hover:bg-white/[0.04] hover:text-ink md:px-0 md:py-0 md:hover:bg-transparent"
+            >Клавиши</a
+          >
+          <a
+            href="#architecture"
+            class="rounded-md px-3 py-2 text-sm font-medium text-ink/70 transition-colors duration-150 hover:bg-white/[0.04] hover:text-ink md:px-0 md:py-0 md:hover:bg-transparent"
+            >Как устроено</a
+          >
+          <a
+            href="#about"
+            class="rounded-md px-3 py-2 text-sm font-medium text-ink/70 transition-colors duration-150 hover:bg-white/[0.04] hover:text-ink md:px-0 md:py-0 md:hover:bg-transparent"
+            >Обо мне</a
+          >
+        </nav>
+
+        <div class="flex items-center gap-2">
+          <a
+            href="editor.html"
+            target="_blank"
+            rel="noopener"
+            aria-label="Открыть редактор (в новой вкладке)"
+            class="inline-flex items-center whitespace-nowrap rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-accent-ink transition-[background-color,transform] duration-150 ease-out hover:bg-accent-hover active:scale-[0.98]"
+            ><span class="sm:hidden">Редактор</span><span class="hidden sm:inline"
+              >Открыть редактор</span
+            ></a
+          >
+          <button
+            id="menu-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="nav-menu"
+            aria-label="Меню"
+            class="items-center justify-center rounded-lg border border-edge p-2 text-ink/70 transition-colors duration-150 hover:text-ink"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <line x1="4" x2="20" y1="7" y2="7" />
+              <line x1="4" x2="20" y1="12" y2="12" />
+              <line x1="4" x2="20" y1="17" y2="17" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ГЕРОЙ -->
+      <section class="canvas-grid relative overflow-hidden">
+        <div class="mx-auto max-w-6xl px-6 pb-14 pt-16 sm:pt-24">
+          <p
+            class="mb-5 font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent"
+          >
+            Учебный проект
+          </p>
+          <h1
+            class="max-w-3xl text-balance text-[clamp(2.25rem,5vw,3.5rem)] font-semibold leading-[1.05] tracking-[-0.02em]"
+          >
+            Редактор векторной графики, собранный в браузере
+          </h1>
+          <p class="mt-6 max-w-[62ch] text-lg leading-relaxed text-ink/70">
+            Mini Figma — учебный редактор на React и TypeScript: холст с сеткой,
+            фигуры протяжкой мыши и история, отменяющая жесты целиком. Открывается
+            прямо в браузере.
+          </p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <a
+              href="editor.html"
+              target="_blank"
+              rel="noopener"
+              aria-label="Открыть редактор (в новой вкладке)"
+              class="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 font-semibold text-accent-ink transition-[background-color,transform] duration-150 ease-out hover:bg-accent-hover active:scale-[0.98]"
+              >Открыть редактор<span aria-hidden="true">↗</span></a
+            >
+            <a
+              href="#features"
+              class="inline-flex items-center gap-2 rounded-lg border border-edge px-5 py-3 font-semibold text-ink transition-[border-color,background-color] duration-150 ease-out hover:border-accent hover:bg-white/[0.03]"
+              >Смотреть возможности</a
+            >
+          </div>
+
+          <p class="mt-6 font-mono text-[13px] text-ink/60">
+            React 19<span class="mx-2 text-ink/30" aria-hidden="true">·</span>TypeScript<span
+              class="mx-2 text-ink/30" aria-hidden="true"
+              >·</span
+            >Tailwind CSS 4<span class="mx-2 text-ink/30" aria-hidden="true">·</span>без установки и
+            регистрации
+          </p>
+        </div>
+
+        <!-- Скриншот реального редактора + две плашки-детали поверх.
+             Нижний отступ у контейнера нужен, чтобы плашка «Пробел + мышь»
+             не упиралась в край секции (у неё отрицательный отступ снизу). -->
+        <div class="mx-auto max-w-6xl px-6 pb-12">
+          <div class="relative">
+            <img
+              src="/screenshot.png"
+              width="1600"
+              height="1052"
+              alt="Холст редактора Mini Figma: сетка, прямоугольник, эллипс и рамка выделения с восемью маркерами"
+              class="w-full rounded-xl border border-edge"
+              fetchpriority="high"
+              decoding="async"
+            />
+            <span
+              class="keycap absolute -top-3 left-6 hidden sm:inline-block"
+              aria-hidden="true"
+              >R — прямоугольник</span
+            >
+            <span
+              class="keycap absolute -bottom-3 right-6 hidden sm:inline-block"
+              aria-hidden="true"
+              >Пробел + мышь — панорама</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ВОЗМОЖНОСТИ -->
+      <section id="features" class="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <p
+          class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent"
+          data-reveal
+        >
+          Возможности
+        </p>
+        <h2
+          class="mt-3 text-balance text-[clamp(1.75rem,2.5vw,2.125rem)] font-semibold tracking-[-0.015em]"
+          data-reveal
+        >
+          Что уже работает
+        </h2>
+
+        <ul class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <li
+            class="group rounded-xl border border-edge bg-panel p-6 transition-colors duration-150 hover:border-accent/60"
+            data-reveal
+          >
+            <span
+              class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-edge bg-canvas text-accent"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="5 9 2 12 5 15" />
+                <polyline points="9 5 12 2 15 5" />
+                <polyline points="15 19 12 22 9 19" />
+                <polyline points="19 9 22 12 19 15" />
+                <line x1="2" x2="22" y1="12" y2="12" />
+                <line x1="12" x2="12" y1="2" y2="22" />
+              </svg>
+            </span>
+            <h3 class="text-lg font-semibold">Камера без сюрпризов</h3>
+            <p class="mt-2 text-[0.9375rem] leading-relaxed text-ink/70">
+              Зум колесом от 10% до 400% фиксирует точку под курсором. Пробел с мышью —
+              панорама, сетка ездит вместе с холстом.
+            </p>
+          </li>
+
+          <li
+            class="group rounded-xl border border-edge bg-panel p-6 transition-colors duration-150 hover:border-accent/60"
+            data-reveal
+          >
+            <span
+              class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-edge bg-canvas text-accent"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"
+                />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+                <circle cx="17.5" cy="17.5" r="3.5" />
+              </svg>
+            </span>
+            <h3 class="text-lg font-semibold">Фигуры протяжкой</h3>
+            <p class="mt-2 text-[0.9375rem] leading-relaxed text-ink/70">
+              Прямоугольник (R) и эллипс (O) создаются движением мыши. Escape отменяет
+              жест прямо на ходу.
+            </p>
+          </li>
+
+          <li
+            class="group rounded-xl border border-edge bg-panel p-6 transition-colors duration-150 hover:border-accent/60"
+            data-reveal
+          >
+            <span
+              class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-edge bg-canvas text-accent"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect width="18" height="18" x="3" y="3" rx="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+              </svg>
+            </span>
+            <h3 class="text-lg font-semibold">Картинки из буфера</h3>
+            <p class="mt-2 text-[0.9375rem] leading-relaxed text-ink/70">
+              Ctrl+V вставляет изображение в центр вида, перетаскивание файла из
+              проводника — под курсором, в собственных пропорциях.
+            </p>
+          </li>
+
+          <li
+            class="group rounded-xl border border-edge bg-panel p-6 transition-colors duration-150 hover:border-accent/60"
+            data-reveal
+          >
+            <span
+              class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-edge bg-canvas text-accent"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 3a2 2 0 0 0-2 2" />
+                <path d="M19 3a2 2 0 0 1 2 2" />
+                <path d="M21 19a2 2 0 0 1-2 2" />
+                <path d="M5 21a2 2 0 0 1-2-2" />
+                <path d="M9 3h1" />
+                <path d="M9 21h1" />
+                <path d="M14 3h1" />
+                <path d="M14 21h1" />
+                <path d="M3 9v1" />
+                <path d="M21 9v1" />
+                <path d="M3 14v1" />
+                <path d="M21 14v1" />
+              </svg>
+            </span>
+            <h3 class="text-lg font-semibold">Выделение и рамка</h3>
+            <p class="mt-2 text-[0.9375rem] leading-relaxed text-ink/70">
+              Клик по фигуре или слою, Shift+клик — несколько сразу. Рамка с восемью
+              маркерами не меняется при зуме.
+            </p>
+          </li>
+
+          <li
+            class="group rounded-xl border border-edge bg-panel p-6 transition-colors duration-150 hover:border-accent/60"
+            data-reveal
+          >
+            <span
+              class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-edge bg-canvas text-accent"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M3 7v6h6" />
+                <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+              </svg>
+            </span>
+            <h3 class="text-lg font-semibold">История помнит жесты</h3>
+            <p class="mt-2 text-[0.9375rem] leading-relaxed text-ink/70">
+              Ctrl+Z отменяет перетаскивание одним нажатием, а не по кадрам. Ctrl+Shift+Z
+              — возврат. Глубина — 50 шагов.
+            </p>
+          </li>
+
+          <li
+            class="group rounded-xl border border-edge bg-panel p-6 transition-colors duration-150 hover:border-accent/60"
+            data-reveal
+          >
+            <span
+              class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg border border-edge bg-canvas text-accent"
+            >
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 8h.01" />
+                <path d="M8 12h.01" />
+                <path d="M10 8h.01" />
+                <path d="M12 12h.01" />
+                <path d="M14 8h.01" />
+                <path d="M16 12h.01" />
+                <path d="M18 8h.01" />
+                <path d="M7 16h10" />
+                <rect width="20" height="16" x="2" y="4" rx="2" />
+              </svg>
+            </span>
+            <h3 class="text-lg font-semibold">Работает на любой раскладке</h3>
+            <p class="mt-2 text-[0.9375rem] leading-relaxed text-ink/70">
+              V / R / O работают и на русской раскладке: обработчик смотрит на клавишу,
+              а не на букву.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ГОРЯЧИЕ КЛАВИШИ -->
+      <section id="hotkeys" class="border-y border-edge bg-panel/40">
+        <div class="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+          <p
+            class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent"
+            data-reveal
+          >
+            Горячие клавиши
+          </p>
+          <h2
+            class="mt-3 text-balance text-[clamp(1.75rem,2.5vw,2.125rem)] font-semibold tracking-[-0.015em]"
+            data-reveal
+          >
+            Руки на клавиши
+          </h2>
+
+          <div
+            class="mt-12 overflow-x-auto rounded-xl border border-edge bg-panel"
+            data-reveal
+          >
+            <table class="w-full border-collapse text-left text-[0.9375rem]">
+              <caption class="sr-only">
+                Горячие клавиши редактора Mini Figma
+              </caption>
+              <thead>
+                <tr class="border-b border-edge">
+                  <th
+                    scope="col"
+                    class="px-5 py-3 font-mono text-xs font-medium uppercase tracking-[0.08em] text-ink/60"
+                  >
+                    Клавиши
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-5 py-3 font-mono text-xs font-medium uppercase tracking-[0.08em] text-ink/60"
+                  >
+                    Действие
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="border-b border-edge/60 transition-colors duration-150 hover:bg-white/[0.03]"
+                >
+                  <td class="w-[38%] px-5 py-3.5 align-top">
+                    <span class="keycap">V</span>
+                    <span class="mx-1 font-mono text-ink/40" aria-hidden="true">/</span>
+                    <span class="keycap">R</span>
+                    <span class="mx-1 font-mono text-ink/40" aria-hidden="true">/</span>
+                    <span class="keycap">O</span>
+                  </td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">
+                    Выделение / прямоугольник / эллипс
+                  </td>
+                </tr>
+                <tr
+                  class="border-b border-edge/60 transition-colors duration-150 hover:bg-white/[0.03]"
+                >
+                  <td class="px-5 py-3.5 align-top"><span class="keycap">Ctrl+V</span></td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">
+                    Вставить картинку из буфера обмена
+                  </td>
+                </tr>
+                <tr
+                  class="border-b border-edge/60 transition-colors duration-150 hover:bg-white/[0.03]"
+                >
+                  <td class="px-5 py-3.5 align-top"><span class="keycap">Ctrl+Z</span></td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">
+                    Отменить последнее изменение
+                  </td>
+                </tr>
+                <tr
+                  class="border-b border-edge/60 transition-colors duration-150 hover:bg-white/[0.03]"
+                >
+                  <td class="px-5 py-3.5 align-top">
+                    <span class="keycap">Ctrl+Shift+Z</span>
+                    <span class="mx-1 font-mono text-ink/40" aria-hidden="true">,</span>
+                    <span class="keycap">Ctrl+Y</span>
+                  </td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">Вернуть отменённое</td>
+                </tr>
+                <tr
+                  class="border-b border-edge/60 transition-colors duration-150 hover:bg-white/[0.03]"
+                >
+                  <td class="px-5 py-3.5 align-top"><span class="keycap">Escape</span></td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">
+                    Отменить жест, иначе снять выделение
+                  </td>
+                </tr>
+                <tr
+                  class="border-b border-edge/60 transition-colors duration-150 hover:bg-white/[0.03]"
+                >
+                  <td class="px-5 py-3.5 align-top">
+                    <span class="keycap">Delete</span>
+                    <span class="mx-1 font-mono text-ink/40" aria-hidden="true">,</span>
+                    <span class="keycap">Backspace</span>
+                  </td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">Удалить выделенное</td>
+                </tr>
+                <tr
+                  class="border-b border-edge/60 transition-colors duration-150 hover:bg-white/[0.03]"
+                >
+                  <td class="px-5 py-3.5 align-top">
+                    <span class="keycap">Пробел</span>
+                    <span class="mx-1 font-mono text-ink/40" aria-hidden="true">+</span>
+                    <span class="keycap">мышь</span>
+                  </td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">Панорама</td>
+                </tr>
+                <tr class="transition-colors duration-150 hover:bg-white/[0.03]">
+                  <td class="px-5 py-3.5 align-top"><span class="keycap">Колесо</span></td>
+                  <td class="px-5 py-3.5 align-top text-ink/80">Зум под курсором</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mt-5 max-w-[70ch] text-sm leading-relaxed text-ink/60" data-reveal>
+            Ctrl+R — перезагрузка страницы, Ctrl+O — открытие файла: мы их не
+            перехватываем. Ctrl+V перехватываем, только если в буфере картинка —
+            вставка текста работает как обычно.
+          </p>
+        </div>
+      </section>
+
+      <!-- КАК УСТРОЕНО -->
+      <section id="architecture" class="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <p
+          class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent"
+          data-reveal
+        >
+          Как устроено
+        </p>
+        <h2
+          class="mt-3 text-balance text-[clamp(1.75rem,2.5vw,2.125rem)] font-semibold tracking-[-0.015em]"
+          data-reveal
+        >
+          Пять слоёв и одно равенство
+        </h2>
+
+        <div class="mt-12 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+          <div data-reveal>
+            <p class="max-w-[62ch] leading-relaxed text-ink/70">
+              Каждая папка отвечает ровно за свою часть и не знает про соседние:
+              компоненты держат экран, хуки — логику без интерфейса, утилиты — чистую
+              математику и работу с файлами, константы — настройки, типы — общий язык
+              проекта.
+            </p>
+
+            <ul class="mt-7 space-y-3 font-mono text-sm">
+              <li class="flex items-baseline gap-3">
+                <span class="text-accent">components</span>
+                <span class="flex-1 border-t border-dashed border-edge"></span>
+                <span class="text-right text-ink/60">один компонент — одна зона экрана</span>
+              </li>
+              <li class="flex items-baseline gap-3">
+                <span class="text-accent">hooks</span>
+                <span class="flex-1 border-t border-dashed border-edge"></span>
+                <span class="text-right text-ink/60">логика без интерфейса</span>
+              </li>
+              <li class="flex items-baseline gap-3">
+                <span class="text-accent">utils</span>
+                <span class="flex-1 border-t border-dashed border-edge"></span>
+                <span class="text-right text-ink/60">математика и файлы без React</span>
+              </li>
+              <li class="flex items-baseline gap-3">
+                <span class="text-accent">constants</span>
+                <span class="flex-1 border-t border-dashed border-edge"></span>
+                <span class="text-right text-ink/60">настройки без магических чисел</span>
+              </li>
+              <li class="flex items-baseline gap-3">
+                <span class="text-accent">types</span>
+                <span class="flex-1 border-t border-dashed border-edge"></span>
+                <span class="text-right text-ink/60">общий язык проекта</span>
+              </li>
+            </ul>
+
+            <p class="mt-6 font-mono text-[13px] text-ink/60">
+              зависимости идут только в одну сторону: components → hooks → utils →
+              constants → types
+            </p>
+          </div>
+
+          <div class="rounded-xl border border-edge bg-panel p-6" data-reveal>
+            <p
+              class="font-mono text-xs font-medium uppercase tracking-[0.08em] text-ink/60"
+            >
+              Ключевая формула
+            </p>
+            <p class="mt-4 font-mono text-[0.9375rem] leading-relaxed text-accent">
+              canvas = (screen − pan) / zoom
+            </p>
+            <p class="mt-4 text-sm leading-relaxed text-ink/60">
+              Единое равенство, на котором держится всё позиционирование. Забытый
+              делитель на зум — классическая причина «уезжающих» фигур при зуме и сдвиге
+              холста.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ОБ АВТОРЕ -->
+      <section id="about" class="border-t border-edge bg-panel/40">
+        <div class="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+          <div class="grid gap-10 lg:grid-cols-[1.4fr_0.6fr] lg:gap-16">
+            <div data-reveal>
+              <p
+                class="font-mono text-[13px] font-medium uppercase tracking-[0.08em] text-accent"
+                data-reveal
+              >
+                Обо мне
+              </p>
+              <h2
+                class="mt-3 text-balance text-[clamp(1.75rem,2.5vw,2.125rem)] font-semibold tracking-[-0.015em]"
+                data-reveal
+              >
+                Обо мне и проекте
+              </h2>
+              <div class="mt-6 max-w-[62ch] space-y-4 leading-relaxed text-ink/70">
+                <p>
+                  Меня зовут Ne_skrina, я учусь веб-разработке. Мне нравится, что
+                  результат виден сразу: написал строчку — увидел её в браузере.
+                </p>
+                <p>
+                  Mini Figma — шаг к умению доводить задачи до конца, а не повторять
+                  чужие примеры. В нём есть холст, состояние, история изменений и
+                  горячие клавиши — то есть задачи уровня настоящей работы.
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="h-fit rounded-xl border border-edge bg-panel p-6"
+              data-reveal
+            >
+              <p
+                class="font-mono text-xs font-medium uppercase tracking-[0.08em] text-ink/60"
+              >
+                Что дальше
+              </p>
+              <ul class="mt-4 space-y-3 text-sm text-ink/70">
+                <li class="flex gap-3">
+                  <span class="font-mono text-accent" aria-hidden="true">01</span>
+                  Изменение размера маркерами и порядок слоёв
+                </li>
+                <li class="flex gap-3">
+                  <span class="font-mono text-accent" aria-hidden="true">02</span>
+                  Тесты на геометрию и историю изменений
+                </li>
+                <li class="flex gap-3">
+                  <span class="font-mono text-accent" aria-hidden="true">03</span>
+                  Сохранение документов: сначала в браузере, потом на бэкенде
+                </li>
+                <li class="flex gap-3">
+                  <span class="font-mono text-accent" aria-hidden="true">04</span>
+                  Экспорт в PNG и SVG
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ФИНАЛЬНЫЙ ПРИЗЫВ -->
+      <section class="border-t border-edge">
+        <div class="mx-auto max-w-6xl px-6 py-16 text-center sm:py-20">
+          <h2 class="text-balance text-2xl font-semibold tracking-[-0.015em]">
+            Попробуйте сами
+          </h2>
+          <p class="mx-auto mt-3 max-w-[46ch] leading-relaxed text-ink/70">
+            Редактор открывается в соседней вкладке — установка и регистрация не нужны.
+          </p>
+          <a
+            href="editor.html"
+            target="_blank"
+            rel="noopener"
+            aria-label="Открыть редактор (в новой вкладке)"
+            class="mt-7 inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 font-semibold text-accent-ink transition-[background-color,transform] duration-150 ease-out hover:bg-accent-hover active:scale-[0.98]"
+            >Открыть редактор<span aria-hidden="true">↗</span></a
+          >
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-edge">
+      <div
+        class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-8 text-sm text-ink/60 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p>© 2026 Ne_skrina · Учебный проект</p>
+        <div class="flex items-center gap-5">
+          <a
+            href="https://github.com/iskrinaprivet-a11y/mini-figma"
+            class="transition-colors duration-150 hover:text-ink"
+            >GitHub</a
+          >
+          <a href="#main" class="transition-colors duration-150 hover:text-ink"
+            >Наверх</a
+          >
+        </div>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/landing.ts"></script>
   </body>
 </html>

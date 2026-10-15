@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# РЎС‚РѕСЂРѕРЅРЅРёР№ РєР»РѕРЅ Figsor вЂ” РјР°С‚РµСЂРёР°Р» СЂР°Р·РІРµРґРєРё, РІ РїСЂРѕРµРєС‚ Рё РІ Р»РёРЅС‚РµСЂ РЅРµ РІС…РѕРґРёС‚.
+figsor/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +25,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Секреты: переменных окружения в проекте нет, но .env коммитить нельзя
+.env
